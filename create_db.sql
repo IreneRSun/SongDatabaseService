@@ -86,7 +86,7 @@ PRAGMA foreign_keys = ON;
 -- USERS (names randomly generated)
 --------
 
-
+INSERT INTO users VALUES ('a01', 'Drake', 'a01');
 INSERT INTO users VALUES ('u01', 'Jess Beil', 'u01');
 INSERT INTO users VALUES ('u02', 'Theon Solomon', 'u02');
 INSERT INTO users VALUES ('u03', 'Sullivan Moses', 'u03');

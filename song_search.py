@@ -1,4 +1,6 @@
+from song_actions import song_actions
 from utils import *
+import os
 
 def get_matches(cursor, keywords):
     """
@@ -70,8 +72,33 @@ def show_playlist(cursor, pid):
     # fetch results
     results = cursor.fetchall()
     # display results
-    for row in results:
-        print(row)
+    for num, row in enumerate(results, 1):
+        print(num, row)
+    # allow user to select a song
+    #while True:
+        #action = input("To select the song number n, type: select n")
+        # if a blank line was entered
+        #if check_blank(action):
+            #return
+        # if the user wants to exit the program
+        #if action == "quit":
+            #quit()
+        # parse input
+        #action = action.lower()
+        #action = action.split()
+        #action_type = action[0]
+        # check input
+        #if action_type == "select" and len(action) > 1 and action[1].isdigit():
+            #choice = int(action[1])
+            # make sure choice is within bounds        
+            #if choice > len(results) or choice < 1:
+                #print("Invalid input")
+            #else:
+                # retrieve choice selected and pass on
+                #data = results[choice - 1]
+                #handle_select(data, cursor)
+
+
 
 
 def handle_select(data, cursor):
@@ -83,11 +110,10 @@ def handle_select(data, cursor):
     """
     # get the type (song or playlist) of the result selected
     result_type = data[0]
-    print(result_type)
     # handle song selection
     if result_type == "Song":
-    # --------- implement song actions ---------
-        pass
+        # handle song actions
+        song_actions(cursor, data[1])
     # handle playlist selection
     elif result_type == "Playlist":
         # get pid of playlist

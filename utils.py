@@ -1,3 +1,5 @@
+import os
+
 def display_line():
     """
     print a line of dashes
@@ -67,6 +69,8 @@ def handle_next(curr_page, results):
     :param results: the ordered list of results to display
     :return: the current page number (int)
     """
+    os.system('cls')
+    
     # change page to the next page if possible
     if curr_page < get_num_pages(results):
         curr_page += 1
@@ -84,6 +88,8 @@ def handle_prev(curr_page, results):
     :param matches: the ordered list of results to display
     :return: the current page number (int)
     """
+    os.system('cls')
+
     # change page to previous page if possible
     if curr_page > 1:
         curr_page -= 1
@@ -103,10 +109,11 @@ def handle_page_logic(results, cursor, on_select):
     Adapted from isun's original code
   """
   # display instructions for selecting an option
-  print("To select a match number n, type: select n")
+  os.system('cls')
+  print("To select the match number n, type: select n")
   print("To see the next page of matches, type: next")
   print("To see the previous page of matches, type: prev")
-  print("To goto the previous menu, type: exit")
+  print("To quit the program, type: quit")
 
   # display first page
   curr_page = 1
@@ -120,6 +127,9 @@ def handle_page_logic(results, cursor, on_select):
     # if user entered a blank line
     if check_blank(action):
         return
+    
+    if action == "quit":
+        quit()
 
     # else parse input
     action = action.lower()
@@ -145,11 +155,7 @@ def handle_page_logic(results, cursor, on_select):
     # handle the prev option
     elif action_type == "prev":
         curr_page = handle_prev(curr_page, results)
-    
-    # handle exit option
-    elif action_type == "exit":
-        break
-
+        
     # handle invalid input
     else:
         print("Invalid input")

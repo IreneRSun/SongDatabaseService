@@ -19,7 +19,7 @@ def get_title():
     gets user input for the title of the song to add
     :return: a blank line if the user enters a blank line (str), otherwise returns the title of the song (str)
     """
-    return input("Enter title of song: ")
+    return input("Enter the title of the song: ")
 
 
 def get_duration():

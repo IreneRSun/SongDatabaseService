@@ -1,3 +1,6 @@
+from utils import display_line
+
+
 def get_top_fans(cursor, aid, limit = 3):
   """
     Finds the top users who have listened the most to an artists' songs.
@@ -53,3 +56,17 @@ def get_top_playlists(cursor, aid, limit = 3):
     })
 
   return top_playlists
+
+def display_top_artist_playlists(cursor, artist_data): 
+  top_playlists = enumerate(get_top_playlists(cursor, artist_data["id"]), 1)
+
+  display_line()
+  for position, playlist in top_playlists:
+    print(position, '\t', playlist)
+
+def display_top_artist_fans(cursor, artist_data):
+  top_fans = enumerate(get_top_fans(cursor, artist_data["id"]), 1)
+
+  display_line()
+  for position, fan in top_fans:
+    print(position, '\t', fan)
