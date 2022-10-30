@@ -35,14 +35,15 @@ def find_artists(cursor, query, limit = 5):
     # for each artist found, increment their freq
     for row in results:
       artist_id, artist_name, nationality = row
-
-      cursor.execute("""
-        SELECT COUNT(*) FROM songs s, artists a, perform p WHERE s.sid = p.sid AND p.aid = a.aid AND a.aid=?
-      """, (artist_id, ))
-      songs_performed = cursor.fetchone()[0]
       
       # ensure artist data can be looked up later
       if artist_id not in possible_artists:
+        # retrieve amount of songs performed by this artist
+        cursor.execute("""
+          SELECT COUNT(*) FROM songs s, artists a, perform p WHERE s.sid = p.sid AND p.aid = a.aid AND a.aid=?
+        """, (artist_id, ))
+        songs_performed = cursor.fetchone()[0]
+
         possible_artists[artist_id] = {
           "id": artist_id,
           "name": artist_name,
@@ -61,7 +62,33 @@ def find_artists(cursor, query, limit = 5):
   # return at MAX "limit" artists
   return ordered_artists[:limit]
 
+def find_artist_songs(cursor, aid):
+  """
+    Given the artist id, find all songs belonging to that artist
+  """
+  cursor.execute("""
+    SELECT s.sid, s.title, s.duration FROM songs s, perform p, artists a
+      WHERE a.aid = ? AND s.sid = p.sid AND p.aid = a.aid
+  """, (aid, ))
+  rows = cursor.fetchall()
 
+  songs = []
+  for row in rows:
+    song_id, song_title, song_duration = row
+    songs.append({
+      "id": song_id,
+      "title": song_title,
+      "duration": song_duration
+    })
+
+  return songs
+
+def show_artist_data(artist_data, songs):
+  print(f"Artist: {artist_data['name']}")
+  # TODO: show menu for songs
+
+def show_artist_option(option_num, artist_data):
+    print(option_num, "\t", f"{artist_data['name']} - {artist_data['nationality']} - {artist_data['songs_performed']} songs performed")
 
 def artist_search(cursor):
   pass
