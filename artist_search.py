@@ -1,22 +1,12 @@
-def get_keywords(query):
-  """
-    Given a query, returns relevant keywords in lowercase
-    No duplicates will be returned.
-  """
-  keywords = set()
-  for keyword in query.split(" "):
-    if not keyword.lower() in keywords:
-      keywords.add(keyword.lower())
-  
-  return keywords
+from utils import *
 
 
-def find_artists(cursor, query, limit = 5):
+
+def find_artists(cursor, keywords):
   """
     Finds artists that match the query and returns the top artists that match the query.
   """
-  keywords = get_keywords(query)
-  
+
   possible_artists = {}
   possible_artist_freq = {}
   artists = []
@@ -58,9 +48,7 @@ def find_artists(cursor, query, limit = 5):
 
   # order the artists by their freq
   ordered_artists = sorted(artists, key=lambda artist: possible_artist_freq[artist["id"]], reverse=True)
-
-  # return at MAX "limit" artists
-  return ordered_artists[:limit]
+  return ordered_artists
 
 def find_artist_songs(cursor, aid):
   """
@@ -83,12 +71,22 @@ def find_artist_songs(cursor, aid):
 
   return songs
 
-def show_artist_data(artist_data, songs):
-  print(f"Artist: {artist_data['name']}")
-  # TODO: show menu for songs
+def handle_select(action, results, cursor):
+  # print(f"Artist: {data['name']}")
+  pass
 
-def show_artist_option(option_num, artist_data):
-    print(option_num, "\t", f"{artist_data['name']} - {artist_data['nationality']} - {artist_data['songs_performed']} songs performed")
+# def show_artist_option(option_num, artist_data):
+#     print(option_num, "\t", f"{artist_data['name']} - {artist_data['nationality']} - {artist_data['songs_performed']} songs performed")
 
 def artist_search(cursor):
-  pass
+  print("Please enter the artist or song you want to find the artist of")
+  print("To stop searching, enter a blank line")
+  display_line()
+
+  keywords = get_keywords()
+  if isinstance(keywords, str):
+    return
+
+  artists = find_artists(cursor, keywords)
+  
+  handle_page_logic(artists, cursor, on_select=handle_select)

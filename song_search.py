@@ -1,33 +1,4 @@
-def display_line():
-    """
-    print a line of dashes
-    :return: N/A
-    """
-    print("-" * 80)
-
-
-def check_blank(inp):
-    """
-    checks whether the user entered a blank line
-    :return: whether the user entered a blank line (bool)
-    """
-    return inp == "" or inp.isspace()
-
-
-def get_keywords():
-    """
-    get keywords to search for from user
-    :return: a blank line if the user enters a blank line (str), otherwise returns keywords to search for (list of str)
-    """
-    # get keywords from user
-    keywords = input("Enter keywords seperated by whitespace: ")
-    # check if user inputted a blank line
-    if check_blank(keywords):
-        return keywords
-    # otherwise return the list of keywords
-    keywords = keywords.split()
-    return keywords
-
+from utils import *
 
 def get_matches(cursor, keywords):
     """
@@ -81,42 +52,6 @@ def remove_dupes(matches):
             exist.add(result)
             new.append(result)
     return new
-
-
-def get_num_pages(results):
-    """
-    get number of pages that can be displayed
-    :param results: list of songs and playlists that contain a keyword, used to determine how many pages there
-    should be (list of tuples)
-    :return: number of pages that can be displayed (int)
-    """
-    num_pages = len(results) // 5
-    if (len(results) / 5) > num_pages:
-        num_pages += 1
-    return num_pages
-
-
-def display_page(results, page_num):
-    """
-    display a page of the results
-    :param results: ordered list of songs and playlists that contain a keyword (list of tuples)
-    :param page_num: the page to display (int)
-    :return: N/A
-    """
-    print(f"Keyword Matching Results Page {page_num}")
-    # get rows for current page
-    start = 5 * (page_num - 1)
-    if (start + 4) > (len(results) - 1):
-        end = len(results)
-    else:
-        end = start + 5
-    curr = results[start:end]
-
-    # display rows of current page
-    curr = enumerate(curr, start + 1)
-    for num, row in curr:
-        print(num, "\t", row)
-
 
 def show_playlist(cursor, pid):
     """
@@ -174,40 +109,6 @@ def handle_select(action, results, cursor):
         print("Invalid input")
 
 
-def handle_next(curr_page, results):
-    """
-    displays the next page of results
-    :param curr_page: the current page (int)
-    :param results: the ordered list of songs and playlists that contain a keyword (list of tuples)
-    :return: the current page number (int)
-    """
-    # change page to the next page if possible
-    if curr_page < get_num_pages(results):
-        curr_page += 1
-        display_page(results, curr_page)
-    # if there is no next page
-    else:
-        print("This is the last page")
-    return curr_page
-
-
-def handle_prev(curr_page, matches):
-    """
-    displays the previous page of results
-    :param curr_page: the current page (int)
-    :param matches: the ordered list of songs and playlists that contain a keyword (list of tuples)
-    :return: the current page number (int)
-    """
-    # change page to previous page if possible
-    if curr_page > 1:
-        curr_page -= 1
-        display_page(matches, curr_page)
-    # if there is no previous page
-    else:
-        print("This is the first page")
-    return curr_page
-
-
 def song_search(connection, cursor, uid=None, aid=None):
     """
     implements process to search for songs/playlists that contain entered keywords
@@ -237,41 +138,4 @@ def song_search(connection, cursor, uid=None, aid=None):
     # remove duplicates rows
     matches = remove_dupes(matches)
 
-    # display instructions for selecting songs/playlists
-    print("To select a match number n, type: select n")
-    print("To see the next page of matches, type: next")
-    print("To see the previous page of matches, type: prev")
-
-    # display first page
-    curr_page = 1
-    display_page(matches, 1)
-
-    # handle user input
-    while True:
-        # get user input
-        action = input("Enter input: ")
-
-        # if user entered a blank line
-        if check_blank(action):
-            return
-
-        # else parse input
-        action = action.lower()
-        action = action.split()
-        action_type = action[0]
-
-        # handle the select option
-        if action_type == "select":
-            handle_select(action, matches, cursor)
-
-        # handle the next option
-        elif action_type == "next":
-            curr_page = handle_next(curr_page, matches)
-
-        # handle the prev option
-        elif action_type == "prev":
-            curr_page = handle_prev(curr_page, matches)
-
-        # handle invalid input
-        else:
-            print("Invalid input")
+    handle_page_logic(matches, cursor, on_select=handle_select)
