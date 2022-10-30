@@ -39,7 +39,6 @@ def get_num_pages(results):
         num_pages += 1
     return num_pages
 
-
 def display_page(results, page_num):
     """
     display a page of the results
@@ -107,7 +106,7 @@ def handle_page_logic(results, cursor, on_select):
   print("To select a match number n, type: select n")
   print("To see the next page of matches, type: next")
   print("To see the previous page of matches, type: prev")
-  print("To exit, type: exit")
+  print("To goto the previous menu, type: exit")
 
   # display first page
   curr_page = 1
@@ -115,33 +114,42 @@ def handle_page_logic(results, cursor, on_select):
 
   # handle user input
   while True:
-      # get user input
-      action = input("Enter input: ")
+    # get user input
+    action = input("Enter input: ")
 
-      # if user entered a blank line
-      if check_blank(action):
-          return
+    # if user entered a blank line
+    if check_blank(action):
+        return
 
-      # else parse input
-      action = action.lower()
-      action = action.split()
-      action_type = action[0]
+    # else parse input
+    action = action.lower()
+    action = action.split()
+    action_type = action[0]
 
-      # handle the select option
-      if action_type == "select":
-          on_select(action, results, cursor)
+    # handle the select option
+    if action_type == "select" and len(action) > 1 and action[1].isdigit():
+        choice = int(action[1])
 
-      # handle the next option
-      elif action_type == "next":
-          curr_page = handle_next(curr_page, results)
+        # Make sure choice is within bounds        
+        if choice > len(results) or choice < 1:
+            print("Invalid input")
+        else:
+            # retrieve choice selected and pass on
+            data = results[choice - 1]
+            on_select(data, cursor)
 
-      # handle the prev option
-      elif action_type == "prev":
-          curr_page = handle_prev(curr_page, results)
-      
-      elif action_type == "exit":
+    # handle the next option
+    elif action_type == "next":
+        curr_page = handle_next(curr_page, results)
+
+    # handle the prev option
+    elif action_type == "prev":
+        curr_page = handle_prev(curr_page, results)
+    
+    # handle exit option
+    elif action_type == "exit":
         break
 
-      # handle invalid input
-      else:
-          print("Invalid input")
+    # handle invalid input
+    else:
+        print("Invalid input")

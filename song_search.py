@@ -74,39 +74,26 @@ def show_playlist(cursor, pid):
         print(row)
 
 
-def handle_select(action, results, cursor):
+def handle_select(data, cursor):
     """
     handle the user selecting a song/playlist from the results
-    :param action: user input indicating which action to take (list of str)
-    :param results: the ordered list of songs and playlists that contain a keyword (list of tuples)
+    :param data: specific song/playlist selected
     :param cursor: the cursor used to get data from the database
     :return: N/A
     """
-    result_num = action[1]
-    # if the result_num is a number
-    if result_num.isdigit():
-        result_num = int(result_num)
-        # if result_num is not in range
-        if result_num > len(results) or result_num < 1:
-            print("Invalid input")
-        # if result_num is in range
-        else:
-            # get the type (song or playlist) of the result selected
-            result_type = results[result_num - 1][0]
-            print(result_type)
-            # handle song selection
-            if result_type == "Song":
-            # --------- implement song actions ---------
-                pass
-            # handle playlist selection
-            elif result_type == "Playlist":
-                # get pid of playlist
-                pid = results[result_num - 1][1]
-                # show songs in playlist
-                show_playlist(cursor, pid)
-    # if the result_num is not a number
-    else:
-        print("Invalid input")
+    # get the type (song or playlist) of the result selected
+    result_type = data[0]
+    print(result_type)
+    # handle song selection
+    if result_type == "Song":
+    # --------- implement song actions ---------
+        pass
+    # handle playlist selection
+    elif result_type == "Playlist":
+        # get pid of playlist
+        pid = data[1]
+        # show songs in playlist
+        show_playlist(cursor, pid)
 
 
 def song_search(connection, cursor, uid=None, aid=None):

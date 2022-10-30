@@ -1,3 +1,4 @@
+from song_search import handle_select
 from utils import *
 
 
@@ -71,9 +72,18 @@ def find_artist_songs(cursor, aid):
 
   return songs
 
-def handle_select(action, results, cursor):
-  # print(f"Artist: {data['name']}")
+def handle_select(data, cursor):
+  songs = find_artist_songs(cursor, data["id"])
+
+  print(f"Artist - {data['name']}")
+  display_line()
+
+  handle_page_logic(songs, cursor, on_select=song_handle_select)
+
+def song_handle_select(data, cursor):
+  # TODO: song actions
   pass
+    
 
 # def show_artist_option(option_num, artist_data):
 #     print(option_num, "\t", f"{artist_data['name']} - {artist_data['nationality']} - {artist_data['songs_performed']} songs performed")
