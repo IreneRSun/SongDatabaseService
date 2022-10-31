@@ -99,63 +99,64 @@ def handle_prev(curr_page, results):
         print("This is the first page")
     return curr_page
 
-def handle_page_logic(results, cursor, on_select):
-  """
-    Utility function to handle multi-page logic
-    :param results: the ordered list of results to display
-    :param cursor: database cursor
-    :param on_select: function to call when an option is selected
+def handle_page_logic(uid, results, cursor, on_select):
+    """
+      Utility function to handle multi-page logic
+      :param uid: needed to end sessions should the user decide to quit
+      :param results: the ordered list of results to display
+      :param cursor: database cursor
+      :param on_select: function to call when an option is selected
+      Adapted from isun's original code
+    """
+    # display instructions for selecting an option
+    os.system('cls')
+    print("To select the match number n, type: select n")
+    print("To see the next page of matches, type: next")
+    print("To see the previous page of matches, type: prev")
+    print("To quit the program, type: quit")
 
-    Adapted from isun's original code
-  """
-  # display instructions for selecting an option
-  os.system('cls')
-  print("To select the match number n, type: select n")
-  print("To see the next page of matches, type: next")
-  print("To see the previous page of matches, type: prev")
-  print("To quit the program, type: quit")
+    # display first page
+    curr_page = 1
+    display_page(results, 1)
 
-  # display first page
-  curr_page = 1
-  display_page(results, 1)
+    # handle user input
+    while True:
+        # get user input
+        action = input("Enter input: ")
 
-  # handle user input
-  while True:
-    # get user input
-    action = input("Enter input: ")
+        # if user entered a blank line
+        if check_blank(action):
+            return
 
-    # if user entered a blank line
-    if check_blank(action):
-        return
-    
-    if action == "quit":
-        quit()
+        if action.lower() == "quit":
+            end_session(cursor, uid)
+            quit()
 
-    # else parse input
-    action = action.lower()
-    action = action.split()
-    action_type = action[0]
+        # else parse input
+        action = action.lower()
+        action = action.split()
+        action_type = action[0]
 
-    # handle the select option
-    if action_type == "select" and len(action) > 1 and action[1].isdigit():
-        choice = int(action[1])
+        # handle the select option
+        if action_type == "select" and len(action) > 1 and action[1].isdigit():
+            choice = int(action[1])
 
-        # Make sure choice is within bounds        
-        if choice > len(results) or choice < 1:
-            print("Invalid input")
+            # Make sure choice is within bounds
+            if choice > len(results) or choice < 1:
+                print("Invalid input")
+            else:
+                # retrieve choice selected and pass on
+                data = results[choice - 1]
+                on_select(data, cursor)
+
+        # handle the next option
+        elif action_type == "next":
+            curr_page = handle_next(curr_page, results)
+
+        # handle the prev option
+        elif action_type == "prev":
+            curr_page = handle_prev(curr_page, results)
+
+        # handle invalid input
         else:
-            # retrieve choice selected and pass on
-            data = results[choice - 1]
-            on_select(data, cursor)
-
-    # handle the next option
-    elif action_type == "next":
-        curr_page = handle_next(curr_page, results)
-
-    # handle the prev option
-    elif action_type == "prev":
-        curr_page = handle_prev(curr_page, results)
-        
-    # handle invalid input
-    else:
-        print("Invalid input")
+            print("Invalid input")
