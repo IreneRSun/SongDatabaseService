@@ -1,6 +1,8 @@
 from song_actions import song_actions
+from start_end import end_session
 from utils import *
 import os
+
 
 def get_matches(cursor, keywords):
     """
@@ -55,13 +57,16 @@ def remove_dupes(matches):
             new.append(result)
     return new
 
-def show_playlist(cursor, pid):
+
+def show_playlist(cursor, pid, uid):
     """
     display songs in playlist
     :param cursor: cursor used to get the songs in the playlist
     :param pid: the id of the playlist to display the songs of
+    :param uid: the user id (str)
     :return: N/A
     """
+    os.system("cls")
     display_line()
     print("Songs in this Playlist")
     # query for songs in the playlist
@@ -73,35 +78,34 @@ def show_playlist(cursor, pid):
     results = cursor.fetchall()
     # display results
     for num, row in enumerate(results, 1):
-        print(num, row)
+        print(num, "sid:", row[0], "title:", row[1], "duration:", row[2])
     # allow user to select a song
-    #while True:
-        #action = input("To select the song number n, type: select n")
+    while True:
+        action = input("To select a song, enter its song number")
         # if a blank line was entered
-        #if check_blank(action):
-            #return
+        if check_blank(action):
+            return
         # if the user wants to exit the program
-        #if action == "quit":
-            #quit()
-        # parse input
-        #action = action.lower()
-        #action = action.split()
-        #action_type = action[0]
+        if action.lower() == "quit":
+            end_session(cursor, uid)
+            quit()
         # check input
-        #if action_type == "select" and len(action) > 1 and action[1].isdigit():
-            #choice = int(action[1])
-            # make sure choice is within bounds        
-            #if choice > len(results) or choice < 1:
-                #print("Invalid input")
-            #else:
-                # retrieve choice selected and pass on
-                #data = results[choice - 1]
-                #handle_select(data, cursor)
+        if action.isdigit():
+            choice = int(action[1])
+            # make sure choice is within bounds
+            if choice > len(results) or choice < 1:
+                print("Please select an existing song number")
+            else:
+                # get data to pass on
+                data = ["Song"]
+                data = data + results[choice - 1]
+                handle_select(data, cursor, uid)
+        # if input is invalid
+        else:
+            print("Invalid input")
 
 
-
-
-def handle_select(data, cursor):
+def handle_select(data, cursor, uid):
     """
     handle the user selecting a song/playlist from the results
     :param data: specific song/playlist selected
@@ -112,23 +116,25 @@ def handle_select(data, cursor):
     result_type = data[0]
     # handle song selection
     if result_type == "Song":
+        # get sid of the song
+        sid = data[1]
         # handle song actions
-        song_actions(cursor, data[1])
+        song_actions(cursor, sid)
     # handle playlist selection
     elif result_type == "Playlist":
         # get pid of playlist
         pid = data[1]
         # show songs in playlist
-        show_playlist(cursor, pid)
+        show_playlist(cursor, pid, uid)
 
 
-def song_search(connection, cursor, uid=None, aid=None):
+def song_search(connection, cursor, session, uid):
     """
     implements process to search for songs/playlists that contain entered keywords
     :param connection: connection to the database
     :param cursor: the cursor to use to query and manipulate the database
-    :param uid: the user id of the user, if user is a normal user
-    :param aid: the artist id of the artist, if user is an artist
+    :param session: whether a session has been started (bool)
+    :param uid: the user id of the user (str)
     :return: N/A
     """
     # print instructions for searching
@@ -138,9 +144,16 @@ def song_search(connection, cursor, uid=None, aid=None):
 
     # get keywords from user
     keywords = get_keywords()
-    # if user inputted a blank line
+
+    # check if user wants to go back or exit the program
     if isinstance(keywords, str):
-        return
+        # if user entered quit
+        if keywords.lower() == "quit":
+            end_session(cursor, uid)
+            quit()
+        # if user inputted a blank line
+        else:
+            return
 
     # get rows of songs/playlists that contain the keywords (contains duplicates)
     matches = get_matches(cursor, keywords)
@@ -151,4 +164,4 @@ def song_search(connection, cursor, uid=None, aid=None):
     # remove duplicates rows
     matches = remove_dupes(matches)
 
-    handle_page_logic(matches, cursor, on_select=handle_select)
+    handle_page_logic(uid, matches, cursor, on_select=handle_select)
