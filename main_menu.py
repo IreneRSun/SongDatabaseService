@@ -7,6 +7,7 @@ from start_end import *
 import os
 
 def first_screen(connection, cursor):
+    os.system("clear")
     print("Enter 1: Sign In")
     print("Enter 2: Sign Up")
     print("Enter 3: Exit")
@@ -105,17 +106,24 @@ def sign_up(connection, cursor):
             break
     
     name = input("Enter Your Name: ")
-    password = input("Enter your password: ")
+    while True:
+        password = getpass("Enter your password: ")
+        confirm_password = getpass("Confirm your password: ")
+        if password == confirm_password:
+            break
+        print("")
+
     data = (username, name, password)
     cursor.execute("INSERT INTO users(uid, name, pwd) VALUES(?, ?, ?);", data)
     connection.commit()
     first_screen(connection, cursor)
 
 def user_second_screen(connection, cursor, uid, session):
+    os.system("clear")
     while True:
-        os.system("clear")
         if session == False:
             while True:
+                os.system("clear")
                 print("Enter 1: Start session")
                 print("Enter 2: Search for songs/playlists")
                 print("Enter 3: Search for artists")
@@ -125,13 +133,13 @@ def user_second_screen(connection, cursor, uid, session):
                 print("Enter : Quit")
                 option = input("Choose your option: ")
                 if option == '1':
-                    sno = get_sno(connection, cursor, uid) + 1
+                    sno = get_sno(cursor, uid) + 1
                     start_session(connection, cursor, uid, sno)
                     session = True
                     break
                 elif option == '2':
-                    # if user play the song, run session_start(connection, cursor), Ill add it later
-                    song_search(connection, cursor, session)
+                    os.system("clear")
+                    song_search(connection, cursor, uid, session)
                 elif option == '3':
                     artist_search(cursor)
                 elif option == '':
@@ -142,6 +150,7 @@ def user_second_screen(connection, cursor, uid, session):
                     print("Please choose correct option.")
         else:
             while True:
+                os.system("clear")
                 print("-----------------In Session-----------------")
                 print("--------------------------------------------")
                 
@@ -159,7 +168,7 @@ def user_second_screen(connection, cursor, uid, session):
                     os.system('clear')
                     song_search(connection, cursor, session)
                 elif option == '3':
-                    sno = get_sno(connection, cursor, uid)
+                    sno = get_sno(cursor, uid)
                     end_session(connection, cursor, uid, sno)
                     session = False
                     break
