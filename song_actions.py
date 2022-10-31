@@ -62,17 +62,19 @@ def get_unique_pid(cursor):
   return pid
 
 
-def add_playlist(connection, cursor, uid):
+def add_playlist(connection, cursor, uid, sid):
   name = input("Enter name of new playlist: ")
   pid = get_unique_pid(cursor)
   cursor.execute("INSERT INTO playlists VALUES (?, ?, ?);", (pid, name, uid))
+  connection.commit()
+  
 
-
-
-def song_actions(cursor, sid):
-  print("What would you like to do?")
-  print("===============")
-
+def song_actions(cursor, sid, uid, session):
+  print("Enter 1: Listen to the Song")
+  print("Enter 2: View More Information About Song")
+  print("Enter 3: Add song to a playlist")
+  display_line()
+    
   # data = get_song_information(cursor, sid)
   # print(f"Song Information - {data['title']}")
   # display_line()
