@@ -1,17 +1,6 @@
-def display_line():
-    """
-    print a line of dashes
-    :return: N/A
-    """
-    print("-" * 80)
-
-
-def check_blank(inp):
-    """
-    checks whether the user entered a blank line
-    :return: whether the user entered a blank line (bool)
-    """
-    return inp == "" or inp.isspace()
+from utils import display_line
+from utils import check_blank
+import os
 
 
 def get_title():
@@ -162,9 +151,11 @@ def add_song(connection, cursor, user_aid):
     :param user_aid: the aid of the artist that is logged in (str)
     :return: N/A
     """
+    os.system("cls")
     # print instructions
     print("When prompted, enter the relevant song details")
     print("To stop adding a song, enter a blank line")
+    print("To exit the program, enter 'quit'")
     display_line()
 
     # get title of the song
@@ -172,12 +163,20 @@ def add_song(connection, cursor, user_aid):
     # stop song adding if user enters a blank line
     if check_blank(title):
         return
+    # quit program if the user enters quit
+    if title.lower() == "quit":
+        quit()
 
     # get duration of the song
     duration = get_duration()
-    # stop song adding if user enters a blank line
+    # check if user wants to quit the program or go back
     if isinstance(duration, str):
-        return
+        # exit the program if the user enters quit
+        if duration == "quit":
+            quit()
+        # stop song adding if user enters a blank line
+        else:
+            return
 
     # check if artist already has song with same title and duration
     find = find_song(user_aid, title, duration, cursor)
@@ -192,9 +191,14 @@ def add_song(connection, cursor, user_aid):
     else:
         # get other artists who also performed this song
         aids = get_aids(cursor, user_aid)
-        # stop song adding if user enters a blank line
+        # check if user wants to quit the program or go back
         if isinstance(aids, str):
-            return
+            # exit the program if the user enters quit
+            if duration == "quit":
+                quit()
+            # stop song adding if user enters a blank line
+            else:
+                return
 
         # generate unique sid for the song
         sid = get_unique_sid(cursor)
