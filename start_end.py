@@ -1,36 +1,31 @@
-def get_next_sno(cursor):
-  """
-    Retrieves the next sno to use for the session
-  """
+def get_sno(connection, cursor, uid):
+    """
+      Retrieves the highest sno
+    """
 
-  cursor.execute("""
-    SELECT (MAX(sno) OR 0) + 1 FROM sessions
-  """)
+    cursor.execute("""SELECT MAX(sno)
+					  FROM sessions
+					  WHERE uid = ?;
+       			   """, (uid, ))
 
-  row = cursor.findone()
+    row = cursor.fetchone()
+    if row[0] == None:
+        return 0
+    else:
+        return row[0]
 
-  return row[0]
+def start_session(connection, cursor, uid, sno):
+	"""
+	Starts a session for a user.
+	"""
 
-def start_session(cursor, uid):
-  """
-    Starts a session for a user.
-    If a user has an existing session, that session will be ended.
-  """
-  
-  # End any existing session they have
-  end_session(cursor, uid)
+	cursor.execute("INSERT INTO sessions (uid, sno, start) VALUES (?, ?, CURRENT_DATE)", (uid, sno))
+	connection.commit()
 
-  sno = get_next_sno()
+def end_session(connection, cursor, uid, sno):
+	"""
+	Stops any active session for a user.
+	"""
 
-  cursor.execute("""
-    INSERT INTO sessions (uid, sno, start) VALUES (?, ?, NOW())
-  """, (uid, sno))
-
-def end_session(cursor, uid):
-  """
-    Stops any active session for a user.
-  """
-  
-  cursor.execute("""
-    UPDATE sessions SET end=NOW() WHERE uid=? AND end=NULL
-  """, (uid, ))
+	cursor.execute("UPDATE sessions SET end=CURRENT_DATE WHERE uid=? AND sno=?", (uid, sno))
+	connection.commit()
