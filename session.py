@@ -43,6 +43,9 @@ class Session:
 	def get_cursor(self):
 		return self.cursor
 
+	def get_conn(self):
+		return self.connection
+
 	def start(self):
 		assert not self.has_started()
 		assert self.is_user()

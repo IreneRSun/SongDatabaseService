@@ -29,6 +29,7 @@ def sign_in(connection, cursor):
     while True:
         username = input("Enter your username: ").lower()
         password = getpass("Enter your password: ")
+
         cursor.execute("""SELECT aid as username, pwd
                           FROM artists
                           WHERE LOWER(aid) = ?
@@ -75,7 +76,7 @@ def sign_in(connection, cursor):
                                   WHERE LOWER(uid) = ?
                                """, (username, ))
                 user_check = cursor.fetchone()
-                if password == user_check[1]:
+                if (user_check != None) and (password == user_check[1]):
                     print("Access granted")
 
                     session = Session(connection, cursor, uid=username)
@@ -88,7 +89,7 @@ def sign_in(connection, cursor):
                                   WHERE LOWER(aid) = ?
                                """, (username, ))
                 user_check = cursor.fetchone()
-                if password == user_check[1]:
+                if (user_check != None) and (password == user_check[1]):
                     print("Access granted")
 
                     session = Session(connection, cursor, aid=username)
@@ -148,10 +149,10 @@ def user_second_screen(session):
                 elif option == '3':
                     artist_search(session)
                 elif option == '':
-                    session.end()
-                    first_screen(connection, cursor)
+                    first_screen(session.get_conn(), session.get_cursor())
                 elif option == '':
-                    session.end()
+                    if session.has_started():
+                        session.end()
                     quit()
                 else:
                     print("Please choose correct option.")
@@ -178,8 +179,6 @@ def user_second_screen(session):
                 elif option == '3':
                     session.end()
                     break
-                elif option == '':
-                    clear_screen()
                 elif option == '':
                     session.end()
                     quit()
