@@ -3,7 +3,7 @@ from artist_search import artist_search
 from artist_stats import *
 from add_song import add_song
 from getpass import getpass
-from start_end import *
+from session import *
 import os
 
 def first_screen(connection, cursor):
@@ -59,9 +59,11 @@ def sign_in(connection, cursor):
                 if password == user_check[1][1]:
                     print("Access granted")
                     if type_of_user == "user":
-                        user_second_screen(connection, cursor, username, False)
+                        session = Session(connection, cursor, uid=username)
+                        user_second_screen(session)
                     else:
-                        artist_second_screen(connection, cursor, False)
+                        session = Session(connection, cursor, aid=username)
+                        artist_second_screen(session)
                 else:
                     print("The username and password you entered do not match")
             except:
@@ -75,7 +77,9 @@ def sign_in(connection, cursor):
                 user_check = cursor.fetchone()
                 if password == user_check[1]:
                     print("Access granted")
-                    user_second_screen(connection, cursor, username, False)
+
+                    session = Session(connection, cursor, uid=username)
+                    user_second_screen(session)
                 else:
                     print("The username and password you entered do not match")
             except:
@@ -86,7 +90,9 @@ def sign_in(connection, cursor):
                 user_check = cursor.fetchone()
                 if password == user_check[1]:
                     print("Access granted")
-                    artist_second_screen(connection, cursor, False)
+
+                    session = Session(connection, cursor, aid=username)
+                    artist_second_screen(session)
                 else:
                     print("The username and password you entered do not match")
 
@@ -118,10 +124,11 @@ def sign_up(connection, cursor):
     connection.commit()
     first_screen(connection, cursor)
 
-def user_second_screen(connection, cursor, uid, session):
+def user_second_screen(session):
     os.system("clear")
+
     while True:
-        if session == False:
+        if not session.has_started():
             while True:
                 os.system("clear")
                 print("Enter 1: Start session")
@@ -133,18 +140,18 @@ def user_second_screen(connection, cursor, uid, session):
                 print("Enter : Quit")
                 option = input("Choose your option: ")
                 if option == '1':
-                    sno = get_sno(cursor, uid) + 1
-                    start_session(connection, cursor, uid, sno)
-                    session = True
+                    session.start()
                     break
                 elif option == '2':
                     os.system("clear")
-                    song_search(connection, cursor, uid, session)
+                    song_search(session)
                 elif option == '3':
-                    artist_search(cursor)
+                    artist_search(session)
                 elif option == '':
+                    session.end()
                     first_screen(connection, cursor)
                 elif option == '':
+                    session.end()
                     quit()
                 else:
                     print("Please choose correct option.")
@@ -163,25 +170,23 @@ def user_second_screen(connection, cursor, uid, session):
                 print("Enter : Quit")
                 option = input("Choose your option: ")
                 if option == '1':
-                    pass
+                    os.system('clear')
+                    song_search(session)
                 elif option == '2':
                     os.system('clear')
-                    song_search(connection, cursor, session)
+                    artist_search(session)
                 elif option == '3':
-                    sno = get_sno(cursor, uid)
-                    end_session(connection, cursor, uid, sno)
-                    session = False
+                    session.end()
                     break
                 elif option == '':
                     os.system('clear')
-                    artist_search(cursor)
                 elif option == '':
-                    
+                    session.end()
                     quit()
                 else:
                     print("Please choose correct option.")
 
-def artist_second_screen(connection, cursor, session, aid):
+def artist_second_screen(session):
     # print instructions
     print("Enter 1: Add a Song")
     print("Enter 2: Find Top Fans and Playlists")
@@ -193,15 +198,15 @@ def artist_second_screen(connection, cursor, session, aid):
 
     # if the artist wants to add a song
     if option == "1":
-        add_song(connection, cursor, aid)
+        add_song(session)
     # if the artist wants to see top fans and playlists
     elif option == "2":
         print("Your top fans")
-        data = get_top_fans(cursor, aid)
-        display_top_artist_fans(cursor, data)
+        data = get_top_fans(session)
+        display_top_artist_fans(session, data)
         print("Your top playlists")
-        data = get_top_playlists(cursor, aid)
-        display_top_artist_playlists(cursor, data)
+        data = get_top_playlists(session)
+        display_top_artist_playlists(session, data)
     # if the artist wants to logout
     elif option == "3":
         return

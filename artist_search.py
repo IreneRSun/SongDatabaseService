@@ -72,15 +72,15 @@ def find_artist_songs(cursor, aid):
 
   return songs
 
-def handle_select(data, cursor):
-  songs = find_artist_songs(cursor, data["id"])
+def handle_select(data, session):
+  songs = find_artist_songs(session.get_cursor(), data["id"])
 
   print(f"Artist - {data['name']}")
   display_line()
 
-  handle_page_logic(songs, cursor, on_select=song_handle_select)
+  handle_page_logic(songs, session, on_select=song_handle_select)
 
-def song_handle_select(data, cursor):
+def song_handle_select(data, session):
   # TODO: song actions
   pass
     
@@ -88,7 +88,7 @@ def song_handle_select(data, cursor):
 # def show_artist_option(option_num, artist_data):
 #     print(option_num, "\t", f"{artist_data['name']} - {artist_data['nationality']} - {artist_data['songs_performed']} songs performed")
 
-def artist_search(cursor):
+def artist_search(session):
   print("Please enter the artist or song you want to find the artist of")
   print("To stop searching, enter a blank line")
   display_line()
@@ -97,6 +97,6 @@ def artist_search(cursor):
   if isinstance(keywords, str):
     return
 
-  artists = find_artists(cursor, keywords)
+  artists = find_artists(session.get_cursor(), keywords)
   
-  handle_page_logic(artists, cursor, on_select=handle_select)
+  handle_page_logic(artists, session, on_select=handle_select)

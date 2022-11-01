@@ -53,11 +53,10 @@ def find_song(user_aid, title, duration, cursor):
     return cursor.fetchone()
 
 
-def get_aids(cursor, user_aid):
+def get_aids(session):
     """
     get other artists who also performed the song that is being added
-    :param cursor: the cursor used to search the database for existing artists
-    :param user_aid: the artist id of the user to ensure result only contains other artists (str)
+    :param session: the artist data, used to ensure result only contains other artists
     :return: a blank line if the user enters a blank line (str), otherwise returns the artist ids of other artists who
     performed the song (list of str)
     """
@@ -78,8 +77,9 @@ def get_aids(cursor, user_aid):
         checked = 0
         for aid in aids:
             # search for aid in artists
+            cursor = session.get_cursor()
             cursor.execute("SELECT * FROM artists WHERE aid = :aid AND aid != :uaid;",
-                           {"aid": aid, "uaid": user_aid})
+                           {"aid": aid, "uaid": session.get_id()})
             result = cursor.fetchone()
             # if artist not found
             if result is None:
@@ -115,16 +115,14 @@ def get_unique_sid(cursor):
     return sid
 
 
-def insert_song(sid, title, duration, user_aid, aids, cursor, connection):
+def insert_song(sid, title, duration, aids, session):
     """
     add a song to the database
     :param sid: the sid to use when adding the song into the database (int)
     :param title: the title of the song to add to the database (str)
     :param duration: the duration of the song to add to the database (int)
-    :param user_aid: the artist adding the song (str)
-    :param aids: the other artists who performed this song (list of str)
-    :param cursor: the cursor used to get the existing sids from the database
-    :param connection: the connection to the database
+    :param aids: any other artists besides the session artist who performed this song (list of str)
+    :param session: the artist session data who also performed this song
     :return: N/A
     """
     # add the new song to songs
@@ -133,7 +131,7 @@ def insert_song(sid, title, duration, user_aid, aids, cursor, connection):
 
     # add the new song to perform with the relevant artists
     # create list of the values to insert into perform
-    insertions = [(user_aid, sid)]
+    insertions = [(session.get_id(), sid)]
     for aid in aids:
         insertions.append((aid, sid))
     # add the artists who performed the song into perform
@@ -143,12 +141,10 @@ def insert_song(sid, title, duration, user_aid, aids, cursor, connection):
     connection.commit()
 
 
-def add_song(connection, cursor, user_aid):
+def add_song(session):
     """
     implements process to add song to database
-    :param connection: connection to the database
-    :param cursor: the cursor to use to query and manipulate the database
-    :param user_aid: the aid of the artist that is logged in (str)
+    :param session: contains user and listening data
     :return: N/A
     """
     os.system("cls")
@@ -179,7 +175,8 @@ def add_song(connection, cursor, user_aid):
             return
 
     # check if artist already has song with same title and duration
-    find = find_song(user_aid, title, duration, cursor)
+    user_aid = session.get_id()
+    find = find_song(user_aid, title, duration, session.get_cursor()) 
 
     # if song with same title and duration already exists
     if find is not None:
@@ -204,7 +201,7 @@ def add_song(connection, cursor, user_aid):
         sid = get_unique_sid(cursor)
 
         # add song to database
-        insert_song(sid, title, duration, user_aid, aids, cursor, connection)
+        insert_song(sid, title, duration, aids, session)
 
         # indicate that the song was successfully added
         print("Song added successfully")

@@ -1,5 +1,4 @@
 from song_actions import song_actions
-from start_end import end_session
 from utils import *
 import os
 
@@ -58,10 +57,10 @@ def remove_dupes(matches):
     return new
 
 
-def show_playlist(cursor, pid, uid):
+def show_playlist(session, pid):
     """
     display songs in playlist
-    :param cursor: cursor used to get the songs in the playlist
+    :param session: contains user and listening session data
     :param pid: the id of the playlist to display the songs of
     :param uid: the user id (str)
     :return: N/A
@@ -70,6 +69,8 @@ def show_playlist(cursor, pid, uid):
     display_line()
     print("Songs in this Playlist")
     # query for songs in the playlist
+    cursor = session.get_cursor()
+
     cursor.execute("""SELECT songs.sid, songs.title, songs.duration
                     FROM songs, plinclude
                     WHERE plinclude.pid = :pid
@@ -87,7 +88,8 @@ def show_playlist(cursor, pid, uid):
             return
         # if the user wants to exit the program
         if action.lower() == "quit":
-            end_session(cursor, uid)
+            if session.has_started():
+                session.end()
             quit()
         # check input
         if action.isdigit():
@@ -99,17 +101,17 @@ def show_playlist(cursor, pid, uid):
                 # get data to pass on
                 data = ["Song"]
                 data = data + results[choice - 1]
-                handle_select(data, cursor, uid)
+                handle_select(data, session)
         # if input is invalid
         else:
             print("Invalid input")
 
 
-def handle_select(data, cursor, uid):
+def handle_select(data, session):
     """
     handle the user selecting a song/playlist from the results
     :param data: specific song/playlist selected
-    :param cursor: the cursor used to get data from the database
+    :param session: contains user and listening data
     :return: N/A
     """
     # get the type (song or playlist) of the result selected
@@ -119,22 +121,19 @@ def handle_select(data, cursor, uid):
         # get sid of the song
         sid = data[1]
         # handle song actions
-        song_actions(cursor, sid)
+        song_actions(session, sid)
     # handle playlist selection
     elif result_type == "Playlist":
         # get pid of playlist
         pid = data[1]
         # show songs in playlist
-        show_playlist(cursor, pid, uid)
+        show_playlist(session, pid)
 
 
-def song_search(connection, cursor, session, uid):
+def song_search(session):
     """
     implements process to search for songs/playlists that contain entered keywords
-    :param connection: connection to the database
-    :param cursor: the cursor to use to query and manipulate the database
-    :param session: whether a session has been started (bool)
-    :param uid: the user id of the user (str)
+    :param session: contains user and listening session data
     :return: N/A
     """
     # print instructions for searching
@@ -149,14 +148,16 @@ def song_search(connection, cursor, session, uid):
     if isinstance(keywords, str):
         # if user entered quit
         if keywords.lower() == "quit":
-            end_session(cursor, uid)
+            if session.has_started():
+                session.end()
+                
             quit()
         # if user inputted a blank line
         else:
             return
 
     # get rows of songs/playlists that contain the keywords (contains duplicates)
-    matches = get_matches(cursor, keywords)
+    matches = get_matches(session.get_cursor(), keywords)
 
     # sort the rows according to the number of matching keywords
     sorted(matches, key=lambda x: matches.count(x), reverse=True)
@@ -164,4 +165,4 @@ def song_search(connection, cursor, session, uid):
     # remove duplicates rows
     matches = remove_dupes(matches)
 
-    handle_page_logic(uid, matches, cursor, on_select=handle_select)
+    handle_page_logic(matches, session, on_select=handle_select)

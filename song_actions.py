@@ -69,7 +69,7 @@ def add_playlist(connection, cursor, uid, sid):
   connection.commit()
   
 
-def song_actions(cursor, sid, uid, session):
+def song_actions(session, sid):
   print("Enter 1: Listen to the Song")
   print("Enter 2: View More Information About Song")
   print("Enter 3: Add song to a playlist")

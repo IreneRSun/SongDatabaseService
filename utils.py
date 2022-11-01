@@ -99,13 +99,13 @@ def handle_prev(curr_page, results):
         print("This is the first page")
     return curr_page
 
-def handle_page_logic(uid, results, cursor, on_select):
+def handle_page_logic(results, session, on_select):
     """
       Utility function to handle multi-page logic
-      :param uid: needed to end sessions should the user decide to quit
       :param results: the ordered list of results to display
-      :param cursor: database cursor
+      :param session: contains user and listening session data
       :param on_select: function to call when an option is selected
+
       Adapted from isun's original code
     """
     # display instructions for selecting an option
@@ -129,7 +129,9 @@ def handle_page_logic(uid, results, cursor, on_select):
             return
 
         if action.lower() == "quit":
-            end_session(cursor, uid)
+            if session.has_started():
+                session.end()
+
             quit()
 
         # else parse input
@@ -147,7 +149,7 @@ def handle_page_logic(uid, results, cursor, on_select):
             else:
                 # retrieve choice selected and pass on
                 data = results[choice - 1]
-                on_select(data, cursor)
+                on_select(data, session)
 
         # handle the next option
         elif action_type == "next":
