@@ -1,7 +1,4 @@
-from utils import display_line
-from utils import check_blank
-import os
-
+from utils import *
 
 def get_title():
     """
@@ -126,6 +123,7 @@ def insert_song(sid, title, duration, aids, session):
     :return: N/A
     """
     # add the new song to songs
+    cursor = session.get_cursor()
     cursor.execute("INSERT INTO songs VALUES (:sid, :title, :duration);",
                    {"sid": sid, "title": title, "duration": duration})
 
@@ -138,7 +136,7 @@ def insert_song(sid, title, duration, aids, session):
     cursor.executemany("INSERT INTO perform VALUES (?, ?);", insertions)
 
     # commit changes
-    connection.commit()
+    session.get_conn().commit()
 
 
 def add_song(session):
@@ -187,7 +185,7 @@ def add_song(session):
     # if song with same title and duration does not already exist
     else:
         # get other artists who also performed this song
-        aids = get_aids(cursor, user_aid)
+        aids = get_aids(session)
         # check if user wants to quit the program or go back
         if isinstance(aids, str):
             # exit the program if the user enters quit
@@ -198,7 +196,7 @@ def add_song(session):
                 return
 
         # generate unique sid for the song
-        sid = get_unique_sid(cursor)
+        sid = get_unique_sid(session.get_cursor())
 
         # add song to database
         insert_song(sid, title, duration, aids, session)
