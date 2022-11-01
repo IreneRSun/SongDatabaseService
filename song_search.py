@@ -90,7 +90,7 @@ def show_playlist(session, pid):
         if action.lower() == "quit":
             if session.has_started():
                 session.end()
-            quit()
+            stop_program(session.get_conn(), session.get_cursor())
         # check input
         if action.isdigit():
             choice = int(action[1])
@@ -151,7 +151,7 @@ def song_search(session):
             if session.has_started():
                 session.end()
                 
-            quit()
+            stop_program(session.get_conn(), session.get_cursor())
         # if user inputted a blank line
         else:
             return

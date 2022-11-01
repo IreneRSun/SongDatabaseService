@@ -4,7 +4,7 @@ from artist_stats import *
 from add_song import add_song
 from getpass import getpass
 from session import *
-from utils import clear_screen
+from utils import *
 
 def first_screen(connection, cursor):
     clear_screen()
@@ -19,7 +19,7 @@ def first_screen(connection, cursor):
         elif option == '2':
             sign_up(connection, cursor)
         elif option == '3':
-            quit()
+            stop_program(connection, cursor)
         else:
             print("Please choose correct option.")
 
@@ -67,7 +67,7 @@ def sign_in(connection, cursor):
                         artist_second_screen(session)
                 else:
                     print("The username and password you entered do not match")
-            except:
+            except Exception:
                 print("The username and password you entered do not match")
         else:
             try:
@@ -76,14 +76,14 @@ def sign_in(connection, cursor):
                                   WHERE LOWER(uid) = ?
                                """, (username, ))
                 user_check = cursor.fetchone()
-                if (user_check != None) and (password == user_check[1]):
+                if password == user_check[1]:
                     print("Access granted")
 
                     session = Session(connection, cursor, uid=username)
                     user_second_screen(session)
                 else:
                     print("The username and password you entered do not match")
-            except:
+            except Exception:
                 cursor.execute("""SELECT aid as username, pwd
                                   FROM artists
                                   WHERE LOWER(aid) = ?
@@ -153,7 +153,7 @@ def user_second_screen(session):
                 elif option == '':
                     if session.has_started():
                         session.end()
-                    quit()
+                    stop_program(session.get_conn(), session.get_cursor())
                 else:
                     print("Please choose correct option.")
         else:
@@ -181,7 +181,7 @@ def user_second_screen(session):
                     break
                 elif option == '':
                     session.end()
-                    quit()
+                    stop_program(session.get_conn(), session.get_cursor())
                 else:
                     print("Please choose correct option.")
 
@@ -208,4 +208,4 @@ def artist_second_screen(session):
             return
         # if the artist wants to exit the program
         elif option == "4":
-            quit()
+            stop_program(session.get_conn(), session.get_cursor())

@@ -21,6 +21,11 @@ def clear_screen():
     else:
         os.system("clear")
 
+def stop_program(connection, cursor):
+    cursor.close()
+    connection.close()
+    quit()
+
 def get_keywords():
     """
     get keywords to search for from user
@@ -138,7 +143,7 @@ def handle_page_logic(results, session, on_select):
             if session.has_started():
                 session.end()
 
-            quit()
+            stop_program(session.get_conn(), session.get_cursor())
 
         # else parse input
         action = action.lower()
