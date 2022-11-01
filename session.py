@@ -57,7 +57,7 @@ class Session:
 		assert self.has_started()
 
 		self.cursor.execute("UPDATE sessions SET end=CURRENT_DATE WHERE uid=? AND sno=?", (self.get_id(), self.get_sno()))
-		connection.commit()
+		self.connection.commit()
 
 		self.sno = None
 		self.has_session = False

@@ -147,7 +147,7 @@ def add_song(session):
     :param session: contains user and listening data
     :return: N/A
     """
-    os.system("cls")
+    clear_screen()
     # print instructions
     print("When prompted, enter the relevant song details")
     print("To stop adding a song, enter a blank line")

@@ -15,6 +15,12 @@ def check_blank(inp):
     """
     return inp == "" or inp.isspace()
 
+def clear_screen():
+    if os.name.startswith("win"):
+        os.system("cls")
+    else:
+        os.system("clear")
+
 def get_keywords():
     """
     get keywords to search for from user
@@ -69,7 +75,7 @@ def handle_next(curr_page, results):
     :param results: the ordered list of results to display
     :return: the current page number (int)
     """
-    os.system('cls')
+    clear_screen()
     
     # change page to the next page if possible
     if curr_page < get_num_pages(results):
@@ -88,7 +94,7 @@ def handle_prev(curr_page, results):
     :param matches: the ordered list of results to display
     :return: the current page number (int)
     """
-    os.system('cls')
+    clear_screen()
 
     # change page to previous page if possible
     if curr_page > 1:
@@ -109,7 +115,7 @@ def handle_page_logic(results, session, on_select):
       Adapted from isun's original code
     """
     # display instructions for selecting an option
-    os.system('cls')
+    clear_screen()
     print("To select the match number n, type: select n")
     print("To see the next page of matches, type: next")
     print("To see the previous page of matches, type: prev")

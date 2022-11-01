@@ -65,7 +65,7 @@ def show_playlist(session, pid):
     :param uid: the user id (str)
     :return: N/A
     """
-    os.system("cls")
+    clear_screen()
     display_line()
     print("Songs in this Playlist")
     # query for songs in the playlist

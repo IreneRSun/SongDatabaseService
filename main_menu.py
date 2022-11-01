@@ -4,10 +4,10 @@ from artist_stats import *
 from add_song import add_song
 from getpass import getpass
 from session import *
-import os
+from utils import clear_screen
 
 def first_screen(connection, cursor):
-    os.system("clear")
+    clear_screen()
     print("Enter 1: Sign In")
     print("Enter 2: Sign Up")
     print("Enter 3: Exit")
@@ -24,7 +24,7 @@ def first_screen(connection, cursor):
             print("Please choose correct option.")
 
 def sign_in(connection, cursor):
-    os.system('clear')
+    clear_screen()
 
     while True:
         username = input("Enter your username: ").lower()
@@ -125,12 +125,12 @@ def sign_up(connection, cursor):
     first_screen(connection, cursor)
 
 def user_second_screen(session):
-    os.system("clear")
+    clear_screen()
 
     while True:
         if not session.has_started():
             while True:
-                os.system("clear")
+                clear_screen()
                 print("Enter 1: Start session")
                 print("Enter 2: Search for songs/playlists")
                 print("Enter 3: Search for artists")
@@ -143,7 +143,7 @@ def user_second_screen(session):
                     session.start()
                     break
                 elif option == '2':
-                    os.system("clear")
+                    clear_screen()
                     song_search(session)
                 elif option == '3':
                     artist_search(session)
@@ -157,7 +157,7 @@ def user_second_screen(session):
                     print("Please choose correct option.")
         else:
             while True:
-                os.system("clear")
+                clear_screen()
                 print("-----------------In Session-----------------")
                 print("--------------------------------------------")
                 
@@ -170,16 +170,16 @@ def user_second_screen(session):
                 print("Enter : Quit")
                 option = input("Choose your option: ")
                 if option == '1':
-                    os.system('clear')
+                    clear_screen()
                     song_search(session)
                 elif option == '2':
-                    os.system('clear')
+                    clear_screen()
                     artist_search(session)
                 elif option == '3':
                     session.end()
                     break
                 elif option == '':
-                    os.system('clear')
+                    clear_screen()
                 elif option == '':
                     session.end()
                     quit()
