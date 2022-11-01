@@ -61,16 +61,18 @@ def get_top_playlists(session, limit = 3):
 
   return top_playlists
 
-def display_top_artist_playlists(session, artist_data): 
-  top_playlists = enumerate(get_top_playlists(session, artist_data["id"]), 1)
+def display_top_artist_playlists(session): 
+  top_playlists = enumerate(get_top_playlists(session), 1)
 
+  print("Top Playlists with your songs")
   display_line()
   for position, playlist in top_playlists:
     print(position, '\t', playlist)
 
-def display_top_artist_fans(session, artist_data):
-  top_fans = enumerate(get_top_fans(session, artist_data["id"]), 1)
+def display_top_artist_fans(session):
+  top_fans = enumerate(get_top_fans(session), 1)
 
+  print("Top Fans of your songs")
   display_line()
   for position, fan in top_fans:
     print(position, '\t', fan)

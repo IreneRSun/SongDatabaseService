@@ -186,29 +186,26 @@ def user_second_screen(session):
                     print("Please choose correct option.")
 
 def artist_second_screen(session):
-    # print instructions
-    print("Enter 1: Add a Song")
-    print("Enter 2: Find Top Fans and Playlists")
-    print("Enter 3: Logout")
-    print("Enter 4: Quit")
+    while True:
+        # print instructions
+        print("Enter 1: Add a Song")
+        print("Enter 2: Find Top Fans and Playlists")
+        print("Enter 3: Logout")
+        print("Enter 4: Quit")
 
-    # prompt user to enter input
-    option = input("Choose your option: ")
+        # prompt user to enter input
+        option = input("Choose your option: ")
 
-    # if the artist wants to add a song
-    if option == "1":
-        add_song(session)
-    # if the artist wants to see top fans and playlists
-    elif option == "2":
-        print("Your top fans")
-        data = get_top_fans(session)
-        display_top_artist_fans(session, data)
-        print("Your top playlists")
-        data = get_top_playlists(session)
-        display_top_artist_playlists(session, data)
-    # if the artist wants to logout
-    elif option == "3":
-        return
-    # if the artist wants to exit the program
-    elif option == "4":
-        quit()
+        # if the artist wants to add a song
+        if option == "1":
+            add_song(session)
+        # if the artist wants to see top fans and playlists
+        elif option == "2":
+            display_top_artist_fans(session)
+            display_top_artist_playlists(session)
+        # if the artist wants to logout
+        elif option == "3":
+            return
+        # if the artist wants to exit the program
+        elif option == "4":
+            quit()
