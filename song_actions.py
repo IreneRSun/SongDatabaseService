@@ -13,11 +13,9 @@ def listen_to_song(session, sid):
   existing_song_listen_results = cursor.fetchone()
   
   if existing_song_listen_results == None:
-    # insert
-    pass
+    cursor.execute("INSERT INTO listen (uid, sno, sid, cnt) VALUES (?, ?, ?, 1)", (session.get_id(), session.get_sno(), sid))
   else:
-    # update
-    pass
+    cursor.execute("UPDATE listen SET cnt=cnt + 1 WHERE uid=? AND sno=? AND sid=?", (session.get_id(), session.get_sno(), sid))
   connection.commit()
 
 def get_song_information(session, sid):
@@ -34,7 +32,7 @@ def get_song_information(session, sid):
   artists_rows = cursor.fetchall()
   artists = []
   for row in artists_rows:
-    artists.append(row["name"])
+    artists.append(row[0])
 
   # Find all playlists the song exists in
   cursor.execute("""
@@ -43,7 +41,7 @@ def get_song_information(session, sid):
   playlist_rows = cursor.fetchall()
   playlists = []
   for row in playlist_rows:
-    playlists.append(row["title"])
+    playlists.append(row[0])
 
   # Return results
   data = {
@@ -85,6 +83,8 @@ def add_playlist(connection, cursor, uid, sid):
   connection.commit()
 
 def song_actions(session, sid):
+  data = get_song_information(session, sid)
+
   clear_screen()
   while True:
     print("Enter 1: Listen to the Song")
@@ -101,10 +101,9 @@ def song_actions(session, sid):
     if action == "1":
       clear_screen()
       listen_to_song(session, sid)
-      return
+      print(f"You listened to {data['title']}!")
     elif action == "2":
       clear_screen()
-      data = get_song_information(session, sid)
       
       print(f"Song Information - {data['title']}")
       display_line()
@@ -112,11 +111,11 @@ def song_actions(session, sid):
       print("ID: ", data["id"])
       print("Duration: ", data["duration"])
 
-      print("Artists: ", data["artists"].join(" "))
-      print("Playlists: ")
+      print("Artists: ", " ".join(data["artists"]))
+      print("Playlists:")
 
       for playlist in data["playlists"]:
-        print(playlist["name"])
+        print(f"- {playlist}")
 
       display_line()
     elif action == "3":

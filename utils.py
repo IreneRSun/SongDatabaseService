@@ -16,7 +16,8 @@ def check_blank(inp):
     return inp == "" or inp.isspace()
 
 def clear_screen():
-    if os.name.startswith("win"):
+    print(os.name)
+    if os.name.startswith("nt"):
         os.system("cls")
     else:
         os.system("clear")
@@ -73,43 +74,6 @@ def display_page(results, page_num):
     for num, row in curr:
         print(num, "\t", row)
 
-def handle_next(curr_page, results):
-    """
-    displays the next page of results
-    :param curr_page: the current page (int)
-    :param results: the ordered list of results to display
-    :return: the current page number (int)
-    """
-    clear_screen()
-    
-    # change page to the next page if possible
-    if curr_page < get_num_pages(results):
-        curr_page += 1
-        display_page(results, curr_page)
-    # if there is no next page
-    else:
-        print("This is the last page")
-    return curr_page
-
-
-def handle_prev(curr_page, results):
-    """
-    displays the previous page of results
-    :param curr_page: the current page (int)
-    :param matches: the ordered list of results to display
-    :return: the current page number (int)
-    """
-    clear_screen()
-
-    # change page to previous page if possible
-    if curr_page > 1:
-        curr_page -= 1
-        display_page(results, curr_page)
-    # if there is no previous page
-    else:
-        print("This is the first page")
-    return curr_page
-
 def handle_page_logic(results, session, on_select):
     """
       Utility function to handle multi-page logic
@@ -119,21 +83,21 @@ def handle_page_logic(results, session, on_select):
 
       Adapted from isun's original code
     """
-    # display instructions for selecting an option
-    clear_screen()
-    print("To select the match number n, type: select n")
-    print("To see the next page of matches, type: next")
-    print("To see the previous page of matches, type: prev")
-    print("To quit the program, type: quit")
 
-    # display first page
     curr_page = 1
-    display_page(results, 1)
-
     # handle user input
+    clear_screen()
     while True:
+        # display first page and instructions for selecting an option
+        print("To select the match number n, type: select n")
+        print("To see the next page of matches, type: next")
+        print("To see the previous page of matches, type: prev")
+        print("To quit the program, type: quit")
+        display_page(results, curr_page)
+
         # get user input
         action = input("Enter input: ")
+        clear_screen()
 
         # if user entered a blank line
         if check_blank(action):
@@ -164,11 +128,19 @@ def handle_page_logic(results, session, on_select):
 
         # handle the next option
         elif action_type == "next":
-            curr_page = handle_next(curr_page, results)
+            if curr_page < get_num_pages(results):
+                curr_page += 1
+            else:
+                print("This is the last page")
 
         # handle the prev option
         elif action_type == "prev":
-            curr_page = handle_prev(curr_page, results)
+            old_last_page = curr_page
+            # change page to previous page if possible
+            if curr_page > 1:
+                curr_page -= 1
+            else:
+                print("This is the first page")
 
         # handle invalid input
         else:

@@ -84,7 +84,7 @@ def sign_in(connection, cursor):
                 else:
                     print("The username and password you entered do not match")
             except Exception as err:
-                print(err)
+                # print(err)
                 cursor.execute("""SELECT aid as username, pwd
                                   FROM artists
                                   WHERE LOWER(aid) = ?
@@ -131,60 +131,56 @@ def user_second_screen(session):
 
     while True:
         if not session.has_started():
-            while True:
+            clear_screen()
+            print("Enter 1: Start session")
+            print("Enter 2: Search for songs/playlists")
+            print("Enter 3: Search for artists")
+
+
+            print("Enter : Log out")
+            print("Enter : Quit")
+            option = input("Choose your option: ")
+            if option == '1':
+                session.start()
+            elif option == '2':
                 clear_screen()
-                print("Enter 1: Start session")
-                print("Enter 2: Search for songs/playlists")
-                print("Enter 3: Search for artists")
-
-
-                print("Enter : Log out")
-                print("Enter : Quit")
-                option = input("Choose your option: ")
-                if option == '1':
-                    session.start()
-                    break
-                elif option == '2':
-                    clear_screen()
-                    song_search(session)
-                elif option == '3':
-                    artist_search(session)
-                elif option == '':
-                    first_screen(session.get_conn(), session.get_cursor())
-                elif option == '':
-                    if session.has_started():
-                        session.end()
-                    stop_program(session.get_conn(), session.get_cursor())
-                else:
-                    print("Please choose correct option.")
+                song_search(session)
+            elif option == '3':
+                artist_search(session)
+            elif option == '':
+                first_screen(session.get_conn(), session.get_cursor())
+            elif option == '':
+                if session.has_started():
+                    session.end()
+                stop_program(session.get_conn(), session.get_cursor())
+            else:
+                print("Please choose correct option.")
         else:
-            while True:
+            clear_screen()
+            print("-----------------In Session-----------------")
+            print("--------------------------------------------")
+            
+            print("Enter 1: Search for songs/playlists")
+            print("Enter 2: Search for artists")
+
+
+            print("Enter 3: End session")
+            print("Enter : Log out")
+            print("Enter : Quit")
+            option = input("Choose your option: ")
+            if option == '1':
                 clear_screen()
-                print("-----------------In Session-----------------")
-                print("--------------------------------------------")
-                
-                print("Enter 1: Search for songs/playlists")
-                print("Enter 2: Search for artists")
-
-
-                print("Enter 3: End session")
-                print("Enter : Log out")
-                print("Enter : Quit")
-                option = input("Choose your option: ")
-                if option == '1':
-                    clear_screen()
-                    song_search(session)
-                elif option == '2':
-                    clear_screen()
-                    artist_search(session)
-                elif option == '3':
-                    session.end()
-                    break
-                elif option == '':
-                    session.end()
-                    stop_program(session.get_conn(), session.get_cursor())
-                else:
-                    print("Please choose correct option.")
+                song_search(session)
+            elif option == '2':
+                clear_screen()
+                artist_search(session)
+            elif option == '3':
+                session.end()
+            elif option == '':
+                session.end()
+                stop_program(session.get_conn(), session.get_cursor())
+            else:
+                print("Please choose correct option.")
 
 def artist_second_screen(session):
     while True:
