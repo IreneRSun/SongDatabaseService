@@ -7,6 +7,10 @@ from session import *
 from utils import *
 
 def first_screen(connection, cursor):
+    """
+        Sign In/Sign Up user
+    """
+    
     clear_screen()
     print("Enter 1: Sign In")
     print("Enter 2: Sign Up")
@@ -24,12 +28,16 @@ def first_screen(connection, cursor):
             print("Please choose correct option.")
 
 def sign_in(connection, cursor):
+    """
+        User sign in
+    """
+    
     clear_screen()
-
+    print("-----------------Sign in-----------------")
     while True:
         username = input("Enter your username: ").lower()
         password = getpass("Enter your password: ")
-
+        # Check user sign in credentials
         cursor.execute("""SELECT aid as username, pwd
                           FROM artists
                           WHERE LOWER(aid) = ?
@@ -40,6 +48,7 @@ def sign_in(connection, cursor):
                        """, (username, username))
     
         user_check = cursor.fetchall()
+        # If account have both user artist, ask which want they want to use to sign in
         if len(user_check) > 1:
             print("Do you want to login as a user or as an artist")
             print("Enter 1 if you are a user")
@@ -69,6 +78,7 @@ def sign_in(connection, cursor):
                     print("The username and password you entered do not match")
             except Exception:
                 print("The username and password you entered do not match")
+        # Sign in as user or artits base on sign in credentials
         else:
             try:
                 cursor.execute("""SELECT uid as username, pwd
@@ -84,7 +94,7 @@ def sign_in(connection, cursor):
                 else:
                     print("The username and password you entered do not match")
             except Exception as err:
-                # print(err)
+                print(err)
                 cursor.execute("""SELECT aid as username, pwd
                                   FROM artists
                                   WHERE LOWER(aid) = ?
@@ -99,13 +109,19 @@ def sign_in(connection, cursor):
                     print("The username and password you entered do not match")
 
 def sign_up(connection, cursor):
+    """
+        Create account for user
+    """
+    clear_screen()
     while True:
+        print("-----------------Sign Up-----------------")
         username = input("Enter your username: ")
         cursor.execute("""SELECT uid
                           FROM users
                           WHERE uid = ?;
                        """, (username, ))
         username_check = cursor.fetchone()
+        # Check if username already exist
         try:
             if username == username_check[0]:
                 print("This username has already been taken. Please enter different username")
@@ -114,6 +130,7 @@ def sign_up(connection, cursor):
             break
     
     name = input("Enter Your Name: ")
+    # Check if password and confirm password match
     while True:
         password = getpass("Enter your password: ")
         confirm_password = getpass("Confirm your password: ")
@@ -121,6 +138,7 @@ def sign_up(connection, cursor):
             break
         print("Password and confirm password not match")
 
+    # Insert new user into database
     data = (username, name, password)
     cursor.execute("INSERT INTO users(uid, name, pwd) VALUES(?, ?, ?);", data)
     connection.commit()
@@ -137,8 +155,8 @@ def user_second_screen(session):
             print("Enter 3: Search for artists")
 
 
-            print("Enter 4: Log out")
-            print("Enter 5: Quit")
+            print("Enter : Log out")
+            print("Enter : Quit")
             option = input("Choose your option: ")
             if option == '1':
                 session.start()
@@ -147,9 +165,9 @@ def user_second_screen(session):
                 song_search(session)
             elif option == '3':
                 artist_search(session)
-            elif option == '4':
+            elif option == '':
                 first_screen(session.get_conn(), session.get_cursor())
-            elif option == '5':
+            elif option == '':
                 if session.has_started():
                     session.end()
                 stop_program(session.get_conn(), session.get_cursor())
@@ -165,8 +183,8 @@ def user_second_screen(session):
 
 
             print("Enter 3: End session")
-            print("Enter 4: Log out")
-            print("Enter 5: Quit")
+            print("Enter : Log out")
+            print("Enter : Quit")
             option = input("Choose your option: ")
             if option == '1':
                 clear_screen()
@@ -176,10 +194,7 @@ def user_second_screen(session):
                 artist_search(session)
             elif option == '3':
                 session.end()
-            elif option == '4':
-                session.end()
-                first_screen(session.get_conn(), session.get_cursor())
-            elif option == '5':
+            elif option == '':
                 session.end()
                 stop_program(session.get_conn(), session.get_cursor())
             else:
