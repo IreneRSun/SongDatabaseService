@@ -79,7 +79,7 @@ def show_playlist(session, pid):
     results = cursor.fetchall()
     # display results
     for num, row in enumerate(results, 1):
-        print(num, row)
+        print(num, "- sid:", row[0], "title:", row[1], "duration:", row[2])
     # allow user to select a song
     while True:
         action = input("To select a song, enter its song number: ")
@@ -166,3 +166,4 @@ def song_search(session):
     matches = remove_dupes(matches)
 
     handle_page_logic(matches, session, on_select=handle_select)
+
