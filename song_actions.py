@@ -1,4 +1,4 @@
-from utils import check_blank, clear_screen, display_line, stop_program
+from utils import check_blank, clear_screen, display_line, stop_program, handle_page_logic
 
 def listen_to_song(session, sid):
   # Start session if no session was started
@@ -56,9 +56,9 @@ def get_song_information(session, sid):
 
 
 
-def add_song_to_playlist(connection, cursor, sid, plid, order):
-  cursor.execute("""INSERT INTO plinclude VALUES (?, ?, ?);""", (plid, sid, order))
-  connection.commit()
+def add_song_to_playlist(session, sid, plid, order):
+  session.get_cursor().execute("""INSERT INTO plinclude VALUES (?, ?, ?);""", (plid, sid, order))
+  session.get_conn().commit()
 
 
 def get_unique_pid(cursor):
@@ -76,11 +76,74 @@ def get_unique_pid(cursor):
   return pid
 
 
-def add_playlist(connection, cursor, uid, sid):
+def add_playlist(session):
+  cursor = session.get_cursor()
+  connection = session.get_conn()
+
   name = input("Enter name of new playlist: ")
-  pid = get_unique_pid(cursor)
-  cursor.execute("INSERT INTO playlists VALUES (?, ?, ?);", (pid, name, uid))
+  pid = get_unique_pid(session.get_cursor())
+
+  cursor.execute("INSERT INTO playlists VALUES (?, ?, ?);", (pid, name, session.get_id()))
   connection.commit()
+
+  return pid
+
+def select_playlist(session):  
+  # Get all playlists the user owns
+  cursor = session.get_cursor()
+  cursor.execute("""
+    SELECT pid, title FROM playlists WHERE uid=?
+  """, (session.get_id(), ))
+  playlist_rows = cursor.fetchall()
+
+  # Ask for playlist to be selected
+  while True:
+    # Display possible options
+    print("Please select a playlist to add this song to")
+    display_line()
+    print("1) Create New Playlist")
+    for placing, row in enumerate(playlist_rows, 2):
+      _, title = row
+      print(f"{placing}) {title}")
+
+    # Get valid input
+    try:
+      selection = int(input("Please select an option: "))      
+    except:
+      clear_screen()
+      print("Invalid input")
+      continue
+    if selection < 1 or selection > len(playlist_rows) + 1:
+      clear_screen()
+      print("Invalid input")
+      continue
+
+    if selection == 1:
+      plid = add_playlist(session)
+    else:
+      plid = playlist_rows[selection - 2][0]
+    
+    return plid
+      
+def get_order():
+  clear_screen()
+  while True:
+    try:
+      order = int(input("What order should this song be placed at: "))
+      return order
+    except:
+      clear_screen()
+      print("Invalid input.")
+
+def has_song(session, plid, sid):
+  cursor = session.get_cursor()
+  cursor.execute("SELECT 1 FROM plinclude WHERE pid=? AND sid=?", (plid, sid))
+  has_song = cursor.fetchone() != None
+
+  return has_song
+
+def playlist_select_callback(data, session):
+  pass
 
 def song_actions(session, sid):
   data = get_song_information(session, sid)
@@ -99,10 +162,12 @@ def song_actions(session, sid):
       break
 
     if action == "1":
+      # listen to song
       clear_screen()
       listen_to_song(session, sid)
       print(f"You listened to {data['title']}!")
     elif action == "2":
+      # view more information about a song
       clear_screen()
       
       print(f"Song Information - {data['title']}")
@@ -119,8 +184,20 @@ def song_actions(session, sid):
 
       display_line()
     elif action == "3":
-      # TODO: Add song to playlist 
-      pass
+      # add song to a playlist
+      clear_screen()
+      plid = select_playlist(session)
+    
+      if has_song(session, plid, sid):
+        clear_screen()
+        print("This playlist already has this song!")
+      else:
+        order = get_order()
+        add_song_to_playlist(session, sid, plid, order)
+
+        clear_screen()
+        print("Added song!")
     elif action == "4":
+      # quit
       stop_program(session.get_conn(), session.get_cursor())
   

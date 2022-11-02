@@ -16,7 +16,6 @@ def check_blank(inp):
     return inp == "" or inp.isspace()
 
 def clear_screen():
-    print(os.name)
     if os.name.startswith("nt"):
         os.system("cls")
     else:
@@ -135,7 +134,6 @@ def handle_page_logic(results, session, on_select):
 
         # handle the prev option
         elif action_type == "prev":
-            old_last_page = curr_page
             # change page to previous page if possible
             if curr_page > 1:
                 curr_page -= 1
