@@ -79,10 +79,10 @@ def show_playlist(session, pid):
     results = cursor.fetchall()
     # display results
     for num, row in enumerate(results, 1):
-        print(num, "sid:", row[0], "title:", row[1], "duration:", row[2])
+        print(num, row)
     # allow user to select a song
     while True:
-        action = input("To select a song, enter its song number")
+        action = input("To select a song, enter its song number: ")
         # if a blank line was entered
         if check_blank(action):
             return
@@ -93,14 +93,14 @@ def show_playlist(session, pid):
             stop_program(session.get_conn(), session.get_cursor())
         # check input
         if action.isdigit():
-            choice = int(action[1])
+            choice = int(action)
             # make sure choice is within bounds
             if choice > len(results) or choice < 1:
                 print("Please select an existing song number")
             else:
                 # get data to pass on
                 data = ["Song"]
-                data = data + results[choice - 1]
+                data = data + [results[choice - 1]]
                 handle_select(data, session)
         # if input is invalid
         else:
@@ -119,7 +119,7 @@ def handle_select(data, session):
     # handle song selection
     if result_type == "Song":
         # get sid of the song
-        sid = data[1]
+        sid = data[1][0]
         # handle song actions
         song_actions(session, sid)
     # handle playlist selection
@@ -150,7 +150,7 @@ def song_search(session):
         if keywords.lower() == "quit":
             if session.has_started():
                 session.end()
-                
+
             stop_program(session.get_conn(), session.get_cursor())
         # if user inputted a blank line
         else:
