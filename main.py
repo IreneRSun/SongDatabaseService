@@ -1,7 +1,8 @@
 from main_menu import *
 import sqlite3
 
-connection = sqlite3.connect("./data.db")
+database = input("Enter database name you want to use: ")
+connection = sqlite3.connect(database)
 cursor = connection.cursor()
 connection.commit()
 
