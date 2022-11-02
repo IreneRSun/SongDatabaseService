@@ -83,7 +83,8 @@ def sign_in(connection, cursor):
                     user_second_screen(session)
                 else:
                     print("The username and password you entered do not match")
-            except Exception:
+            except Exception as err:
+                print(err)
                 cursor.execute("""SELECT aid as username, pwd
                                   FROM artists
                                   WHERE LOWER(aid) = ?
@@ -201,8 +202,11 @@ def artist_second_screen(session):
             add_song(session)
         # if the artist wants to see top fans and playlists
         elif option == "2":
+            clear_screen()
             display_top_artist_fans(session)
+            display_line()
             display_top_artist_playlists(session)
+            display_line()
         # if the artist wants to logout
         elif option == "3":
             return
