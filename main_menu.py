@@ -137,8 +137,8 @@ def user_second_screen(session):
             print("Enter 3: Search for artists")
 
 
-            print("Enter : Log out")
-            print("Enter : Quit")
+            print("Enter 4: Log out")
+            print("Enter 5: Quit")
             option = input("Choose your option: ")
             if option == '1':
                 session.start()
@@ -147,9 +147,9 @@ def user_second_screen(session):
                 song_search(session)
             elif option == '3':
                 artist_search(session)
-            elif option == '':
+            elif option == '4':
                 first_screen(session.get_conn(), session.get_cursor())
-            elif option == '':
+            elif option == '5':
                 if session.has_started():
                     session.end()
                 stop_program(session.get_conn(), session.get_cursor())
@@ -165,8 +165,8 @@ def user_second_screen(session):
 
 
             print("Enter 3: End session")
-            print("Enter : Log out")
-            print("Enter : Quit")
+            print("Enter 4: Log out")
+            print("Enter 5: Quit")
             option = input("Choose your option: ")
             if option == '1':
                 clear_screen()
@@ -176,7 +176,10 @@ def user_second_screen(session):
                 artist_search(session)
             elif option == '3':
                 session.end()
-            elif option == '':
+            elif option == '4':
+                session.end()
+                first_screen(session.get_conn(), session.get_cursor())
+            elif option == '5':
                 session.end()
                 stop_program(session.get_conn(), session.get_cursor())
             else:

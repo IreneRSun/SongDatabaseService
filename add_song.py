@@ -159,6 +159,8 @@ def add_song(session):
         return
     # quit program if the user enters quit
     if title.lower() == "quit":
+        if session.has_started():
+            session.end()
         stop_program(session.get_conn(), session.get_cursor())
 
     # get duration of the song
@@ -167,6 +169,8 @@ def add_song(session):
     if isinstance(duration, str):
         # exit the program if the user enters quit
         if duration == "quit":
+            if session.has_started():
+                session.end()
             stop_program(session.get_conn(), session.get_cursor())
         # stop song adding if user enters a blank line
         else:
@@ -190,6 +194,8 @@ def add_song(session):
         if isinstance(aids, str):
             # exit the program if the user enters quit
             if duration == "quit":
+                if session.has_started():
+                    session.end()
                 stop_program(session.get_conn(), session.get_cursor())
             # stop song adding if user enters a blank line
             else:
