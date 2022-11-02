@@ -53,13 +53,13 @@ class Session:
 		self.sno = get_next_sno(self.get_cursor(), self.id)
 		self.has_session = True
 
-		self.cursor.execute("INSERT INTO sessions (uid, sno, start) VALUES (?, ?, CURRENT_DATE)", (self.get_id(), self.get_sno()))
+		self.cursor.execute("INSERT INTO sessions (uid, sno, start) VALUES (?, ?, DATETIME())", (self.get_id(), self.get_sno()))
 		self.connection.commit()
 
 	def end(self):
 		assert self.has_started()
 
-		self.cursor.execute("UPDATE sessions SET end=CURRENT_DATE WHERE uid=? AND sno=?", (self.get_id(), self.get_sno()))
+		self.cursor.execute("UPDATE sessions SET end=DATETIME() WHERE uid=? AND sno=?", (self.get_id(), self.get_sno()))
 		self.connection.commit()
 
 		self.sno = None
