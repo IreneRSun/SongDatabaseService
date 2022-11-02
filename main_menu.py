@@ -119,7 +119,7 @@ def sign_up(connection, cursor):
         confirm_password = getpass("Confirm your password: ")
         if password == confirm_password:
             break
-        print("Password and confirm password not match"")
+        print("Password and confirm password not match")
 
     data = (username, name, password)
     cursor.execute("INSERT INTO users(uid, name, pwd) VALUES(?, ?, ?);", data)
