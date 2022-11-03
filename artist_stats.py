@@ -67,7 +67,7 @@ def display_top_artist_playlists(session):
   print("Top Playlists with your songs")
   display_line()
   for position, playlist in top_playlists:
-    print(position, '\t', playlist)
+    print(position, '\t', f"{playlist['title']} - {playlist['artist_song_count']} of your songs")
 
 def display_top_artist_fans(session):
   top_fans = enumerate(get_top_fans(session), 1)
@@ -75,4 +75,4 @@ def display_top_artist_fans(session):
   print("Top Fans of your songs")
   display_line()
   for position, fan in top_fans:
-    print(position, '\t', fan)
+    print(position, '\t', f"{fan['name']} - listened to your songs for {fan['listen_time']}")
