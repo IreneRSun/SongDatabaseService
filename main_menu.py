@@ -200,6 +200,7 @@ def user_second_screen(session):
                 print("Please choose correct option.")
 
 def artist_second_screen(session):
+    clear_screen()
     while True:
         # print instructions
         print("Enter 1: Add a Song")
