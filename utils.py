@@ -71,7 +71,7 @@ def display_page(results, page_num):
     # display rows of current page
     curr = enumerate(curr, start + 1)
     for num, row in curr:
-        print(num, "\t", row)
+        print(num, "\t", row[0])
 
 def handle_page_logic(results, session, on_select):
     """
@@ -91,6 +91,7 @@ def handle_page_logic(results, session, on_select):
         print("To select the match number n, type: select n")
         print("To see the next page of matches, type: next")
         print("To see the previous page of matches, type: prev")
+        print("To go back, enter an empty line.")
         print("To quit the program, type: quit")
         display_page(results, curr_page)
 
@@ -122,7 +123,7 @@ def handle_page_logic(results, session, on_select):
                 print("Invalid input")
             else:
                 # retrieve choice selected and pass on
-                data = results[choice - 1]
+                data = results[choice - 1][1]
                 on_select(data, session)
 
         # handle the next option

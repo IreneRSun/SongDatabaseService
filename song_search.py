@@ -99,8 +99,7 @@ def show_playlist(session, pid):
                 print("Please select an existing song number")
             else:
                 # get data to pass on
-                data = ["Song"]
-                data = data + [results[choice - 1]]
+                data = ("Song", ) + results[choice - 1]
                 handle_select(data, session)
         # if input is invalid
         else:
@@ -108,6 +107,7 @@ def show_playlist(session, pid):
 
 
 def handle_select(data, session):
+    print(data)
     """
     handle the user selecting a song/playlist from the results
     :param data: specific song/playlist selected
@@ -119,7 +119,7 @@ def handle_select(data, session):
     # handle song selection
     if result_type == "Song":
         # get sid of the song
-        sid = data[1][0]
+        sid = data[1]
         # handle song actions
         song_actions(session, sid)
     # handle playlist selection
@@ -165,5 +165,9 @@ def song_search(session):
     # remove duplicates rows
     matches = remove_dupes(matches)
 
-    handle_page_logic(matches, session, on_select=handle_select)
+    display_matches = []
+    for match in matches:
+        display_matches.append(f"{match[2]}")
+
+    handle_page_logic(list(zip(display_matches, matches)), session, on_select=handle_select)
 

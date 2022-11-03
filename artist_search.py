@@ -1,4 +1,5 @@
 from song_search import handle_select
+from song_actions import song_actions
 from utils import *
 
 
@@ -78,15 +79,14 @@ def handle_select(data, session):
   print(f"Artist - {data['name']}")
   display_line()
 
-  handle_page_logic(songs, session, on_select=song_handle_select)
+  display_songs = []
+  for song in songs:
+    display_songs.append(f"{song['title']} (Duration: {song['duration']})")
+
+  handle_page_logic(list(zip(display_songs, songs)), session, on_select=song_handle_select)
 
 def song_handle_select(data, session):
-  # TODO: song actions
-  pass
-    
-
-# def show_artist_option(option_num, artist_data):
-#     print(option_num, "\t", f"{artist_data['name']} - {artist_data['nationality']} - {artist_data['songs_performed']} songs performed")
+  song_actions(session, data["id"])
 
 def artist_search(session):
   print("Please enter the artist or song you want to find the artist of")
@@ -98,5 +98,9 @@ def artist_search(session):
     return
 
   artists = find_artists(session.get_cursor(), keywords)
+
+  display_artists = []
+  for artist in artists:
+    display_artists.append(f"{artist['name']} ({artist['nationality']})")
   
-  handle_page_logic(artists, session, on_select=handle_select)
+  handle_page_logic(list(zip(display_artists, artists)), session, on_select=handle_select)

@@ -1,4 +1,4 @@
-from utils import check_blank, clear_screen, display_line, stop_program, handle_page_logic
+from utils import check_blank, clear_screen, display_line, stop_program
 
 def listen_to_song(session, sid):
   # Start session if no session was started
@@ -100,6 +100,7 @@ def select_playlist(session):
   while True:
     # Display possible options
     print("Please select a playlist to add this song to")
+    print("Enter a blank line to go cancel")
     display_line()
     print("1) Create New Playlist")
     for placing, row in enumerate(playlist_rows, 2):
@@ -108,7 +109,12 @@ def select_playlist(session):
 
     # Get valid input
     try:
-      selection = int(input("Please select an option: "))      
+      selection = input("Please select an option: ")
+
+      if check_blank(selection):
+        return None
+
+      selection = int(selection)  
     except:
       clear_screen()
       print("Invalid input")
@@ -129,8 +135,12 @@ def get_order():
   clear_screen()
   while True:
     try:
-      order = int(input("What order should this song be placed at: "))
-      return order
+      order = input("What order should this song be placed at: ")
+
+      if check_blank(order):
+        return None
+
+      return int(order)
     except:
       clear_screen()
       print("Invalid input.")
@@ -142,9 +152,6 @@ def has_song(session, plid, sid):
 
   return has_song
 
-def playlist_select_callback(data, session):
-  pass
-
 def song_actions(session, sid):
   data = get_song_information(session, sid)
 
@@ -154,6 +161,7 @@ def song_actions(session, sid):
     print("Enter 2: View More Information About Song")
     print("Enter 3: Add song to a playlist")
     print("Enter 4: Quit")
+    print("Enter a black line to go back.")
     display_line()
 
     action = input("Which option would you like to choose? ")
@@ -187,12 +195,19 @@ def song_actions(session, sid):
       # add song to a playlist
       clear_screen()
       plid = select_playlist(session)
+      if plid == None:
+        clear_screen()
+        continue
     
       if has_song(session, plid, sid):
         clear_screen()
         print("This playlist already has this song!")
       else:
         order = get_order()
+        if order == None:
+          clear_screen()
+          continue
+
         add_song_to_playlist(session, sid, plid, order)
 
         clear_screen()

@@ -5,6 +5,7 @@ from add_song import add_song
 from getpass import getpass
 from session import *
 from utils import *
+import traceback
 
 def first_screen(connection, cursor):
     """
@@ -95,6 +96,7 @@ def sign_in(connection, cursor):
                     print("The username and password you entered do not match")
             except Exception as err:
                 print(err)
+                traceback.print_exc()
                 cursor.execute("""SELECT aid as username, pwd
                                   FROM artists
                                   WHERE LOWER(aid) = ?
