@@ -88,11 +88,12 @@ def handle_page_logic(results, session, on_select):
     clear_screen()
     while True:
         # display first page and instructions for selecting an option
-        print("To select the match number n, type: select n")
-        print("To see the next page of matches, type: next")
-        print("To see the previous page of matches, type: prev")
+        print("To select the match number n, type: 'select n'")
+        print("To see the next page of matches, type: 'next'")
+        print("To see the previous page of matches, type: 'prev'")
         print("To go back, enter an empty line.")
         print("To quit the program, type: quit")
+        print(" ")
         display_page(results, curr_page)
 
         # get user input
