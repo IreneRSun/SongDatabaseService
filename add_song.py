@@ -180,32 +180,36 @@ def add_song(session):
     user_aid = session.get_id()
     find = find_song(user_aid, title, duration, session.get_cursor()) 
 
-    # if song with same title and duration already exists
+    # if song with same title already exists
     if find is not None:
         # warn the user and reject it
-        print("Song with same title and duration already exists")
-        print("Song not added")
-
-    # if song with same title and duration does not already exist
-    else:
-        # get other artists who also performed this song
-        aids = get_aids(session)
-        # check if user wants to quit the program or go back
-        if isinstance(aids, str):
-            # exit the program if the user enters quit
-            if duration == "quit":
-                if session.has_started():
-                    session.end()
-                stop_program(session.get_conn(), session.get_cursor())
-            # stop song adding if user enters a blank line
+        while True:
+            clear_screen()
+            print("Song with same title already exists.")
+            answer = input("Are you sure you want to continue? (yes/no) ")
+            if answer == "yes":
+                break
             else:
                 return
 
-        # generate unique sid for the song
-        sid = get_unique_sid(session.get_cursor())
+    # get other artists who also performed this song
+    aids = get_aids(session)
+    # check if user wants to quit the program or go back
+    if isinstance(aids, str):
+        # exit the program if the user enters quit
+        if duration == "quit":
+            if session.has_started():
+                session.end()
+            stop_program(session.get_conn(), session.get_cursor())
+        # stop song adding if user enters a blank line
+        else:
+            return
 
-        # add song to database
-        insert_song(sid, title, duration, aids, session)
+    # generate unique sid for the song
+    sid = get_unique_sid(session.get_cursor())
 
-        # indicate that the song was successfully added
-        print("Song added successfully")
+    # add song to database
+    insert_song(sid, title, duration, aids, session)
+
+    # indicate that the song was successfully added
+    print("Song added successfully")
